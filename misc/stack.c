@@ -3,7 +3,7 @@
 #include <string.h>
 int bof(char *str)
 {
-	char buffer[64];
+	char buffer[12];
 	/* The following statement has a buffer overflow problem */
 
 	strcpy(buffer, str);
